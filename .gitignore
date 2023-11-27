@@ -1,0 +1,17 @@
+# Idea project files
+*.iml
+.idea/
+!.idea/codeStyles/
+.run
+
+# Gradle files
+out/
+build/
+.gradle/
+
+# Generated sources
+src/generated
+
+# OS specific
+.DS_Store
+.devcontainer
