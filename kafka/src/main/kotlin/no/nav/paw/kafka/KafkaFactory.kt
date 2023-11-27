@@ -5,10 +5,12 @@ import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serializer
 import java.util.*
 
@@ -29,7 +31,7 @@ data class SchemaRegistryConfig(
     val username: String?,
     val password: String?,
     val autoRegisterSchema: Boolean = true,
-    val kafkaAvroSpecificReaderConfig: Boolean = true
+    val avroSpecificReaderConfig: Boolean = true
 )
 
 class KafkaFactory(private val config: KafkaConfig) {
@@ -58,6 +60,20 @@ class KafkaFactory(private val config: KafkaConfig) {
             valueSerializer
         )
 
+    fun <K : Any, V : Any> createConsumer(
+        clientId: String,
+        keyDeserializer: Deserializer<K>,
+        valueDeserializer: Deserializer<V>
+    ): KafkaConsumer<K, V> =
+        KafkaConsumer(
+            baseProperties +
+                mapOf(
+                    ConsumerConfig.CLIENT_ID_CONFIG to clientId,
+                    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to keyDeserializer::class.java,
+                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to valueDeserializer::class.java
+                )
+        )
+
     private fun authenticationConfig(config: KafkaAuthenticationConfig): Map<String, Any> =
         mapOf(
             CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SSL",
@@ -77,7 +93,7 @@ class KafkaFactory(private val config: KafkaConfig) {
             SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
             SchemaRegistryClientConfig.USER_INFO_CONFIG to "${config.username}:${config.password}",
             KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS to config.autoRegisterSchema,
-            KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to config.kafkaAvroSpecificReaderConfig
+            KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to config.avroSpecificReaderConfig
         ).apply {
             config.username?.let {
                 SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO"

@@ -2,6 +2,7 @@ package no.nav.paw.kafka
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.common.serialization.Serdes
 import kotlin.io.path.absolutePathString
@@ -75,5 +76,22 @@ class KafkaFactoryTest : StringSpec({
             )
 
         producer.javaClass shouldBe KafkaProducer::class.java
+    }
+    "lager kafka consumer" {
+        val config =
+            KafkaConfig(
+                brokers = "localhost:9092"
+            )
+
+        val factory = KafkaFactory(config)
+
+        val consumer =
+            factory.createConsumer(
+                "testId",
+                Serdes.String().deserializer(),
+                Serdes.String().deserializer()
+            )
+
+        consumer.javaClass shouldBe KafkaConsumer::class.java
     }
 })
