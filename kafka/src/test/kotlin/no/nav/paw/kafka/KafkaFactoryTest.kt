@@ -32,7 +32,7 @@ class KafkaFactoryTest : StringSpec({
             KafkaConfig(
                 brokers = "localhost:9092",
                 schemaRegistry =
-                    SchemaRegistryConfig(
+                    KafkaSchemaRegistryConfig(
                         url = "http://localhost:8081",
                         username = "username",
                         password = "password"
@@ -48,7 +48,7 @@ class KafkaFactoryTest : StringSpec({
             KafkaConfig(
                 brokers = "localhost:9092",
                 schemaRegistry =
-                    SchemaRegistryConfig(
+                    KafkaSchemaRegistryConfig(
                         url = "http://localhost:8081",
                         username = "username",
                         password = "password"

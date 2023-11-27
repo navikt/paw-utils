@@ -17,7 +17,7 @@ import java.util.*
 data class KafkaConfig(
     val brokers: String,
     val authentication: KafkaAuthenticationConfig? = null,
-    val schemaRegistry: SchemaRegistryConfig? = null
+    val schemaRegistry: KafkaSchemaRegistryConfig? = null
 )
 
 data class KafkaAuthenticationConfig(
@@ -26,7 +26,7 @@ data class KafkaAuthenticationConfig(
     val credstorePsw: String
 )
 
-data class SchemaRegistryConfig(
+data class KafkaSchemaRegistryConfig(
     val url: String,
     val username: String?,
     val password: String?,
@@ -87,7 +87,7 @@ class KafkaFactory(private val config: KafkaConfig) {
             SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to ""
         )
 
-    private fun schemaRegistryConfig(config: SchemaRegistryConfig): Map<String, Any> =
+    private fun schemaRegistryConfig(config: KafkaSchemaRegistryConfig): Map<String, Any> =
         mapOf(
             KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to config.url,
             SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE to "USER_INFO",
