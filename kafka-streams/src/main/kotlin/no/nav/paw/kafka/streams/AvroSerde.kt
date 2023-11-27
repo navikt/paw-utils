@@ -31,9 +31,9 @@ data class KafkaStreamsAuthenticationConfig(
     val credstorePsw: String
 )
 
-class KafkaFactory(private val config: KafkaStreamsConfig) {
-    val schemaRegistry = config.schemaRegistry?.let { schemaRegistryConfig(it) }.orEmpty()
-    val authentication = config.authentication?.let { authenticationConfig(it) }.orEmpty()
+class KafkaStreamsFactory(config: KafkaStreamsConfig) {
+    private val schemaRegistry = config.schemaRegistry?.let { schemaRegistryConfig(it) }.orEmpty()
+    private val authentication = config.authentication?.let { authenticationConfig(it) }.orEmpty()
     private val baseProperties =
         mapOf(
             StreamsConfig.BOOTSTRAP_SERVERS_CONFIG to config.brokers,
