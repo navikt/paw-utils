@@ -1,4 +1,4 @@
-package no.nav.paw.kafka
+package no.nav.paw.config.kafka
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -19,7 +19,7 @@ class KafkaFactoryTest : StringSpec({
                     KafkaAuthenticationConfig(
                         truststorePath = truststoreFile.absolutePathString(),
                         keystorePath = keystoreFile.absolutePathString(),
-                        credstorePsw = "password"
+                        credstorePassword = "password"
                     )
             )
 
@@ -87,9 +87,10 @@ class KafkaFactoryTest : StringSpec({
 
         val consumer =
             factory.createConsumer(
-                "testId",
-                Serdes.String().deserializer(),
-                Serdes.String().deserializer()
+                groupId = "groupId",
+                clientId = "clientId",
+                keyDeserializer = Serdes.String().deserializer(),
+                valueDeserializer = Serdes.String().deserializer()
             )
 
         consumer.javaClass shouldBe KafkaConsumer::class.java

@@ -1,4 +1,4 @@
-package no.nav.paw.kafka
+package no.nav.paw.config.kafka
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
@@ -14,32 +14,10 @@ import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serializer
 import java.util.*
 
-data class KafkaConfig(
-    val brokers: String,
-    val authentication: KafkaAuthenticationConfig? = null,
-    val schemaRegistry: KafkaSchemaRegistryConfig? = null
-)
-
-data class KafkaAuthenticationConfig(
-    val truststorePath: String,
-    val keystorePath: String,
-    val credstorePsw: String
-)
-
-data class KafkaSchemaRegistryConfig(
-    val url: String,
-    val username: String?,
-    val password: String?,
-    val autoRegisterSchema: Boolean = true,
-    val avroSpecificReaderConfig: Boolean = true
-)
-
 class KafkaFactory(private val config: KafkaConfig) {
     val baseProperties =
         Properties().apply {
             this[CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG] = config.brokers
-            this[ProducerConfig.ACKS_CONFIG] = "all"
-            this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
             config.authentication?.let { putAll(authenticationConfig(it)) }
             config.schemaRegistry?.let { putAll(schemaRegistryConfig(it)) }
         }
@@ -47,11 +25,13 @@ class KafkaFactory(private val config: KafkaConfig) {
     fun <K : Any, V : Any> createProducer(
         clientId: String,
         keySerializer: Serializer<K>,
-        valueSerializer: Serializer<V>
+        valueSerializer: Serializer<V>,
+        acks: String = "all"
     ): Producer<K, V> =
         KafkaProducer(
             baseProperties +
                 mapOf(
+                    ProducerConfig.ACKS_CONFIG to acks,
                     ProducerConfig.CLIENT_ID_CONFIG to clientId,
                     ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to keySerializer::class.java,
                     ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to valueSerializer::class.java
@@ -61,13 +41,17 @@ class KafkaFactory(private val config: KafkaConfig) {
         )
 
     fun <K : Any, V : Any> createConsumer(
+        groupId: String,
         clientId: String,
         keyDeserializer: Deserializer<K>,
-        valueDeserializer: Deserializer<V>
+        valueDeserializer: Deserializer<V>,
+        autoOffsetReset: String = "earliest"
     ): KafkaConsumer<K, V> =
         KafkaConsumer(
             baseProperties +
                 mapOf(
+                    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to autoOffsetReset,
+                    ConsumerConfig.GROUP_ID_CONFIG to groupId,
                     ConsumerConfig.CLIENT_ID_CONFIG to clientId,
                     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to keyDeserializer::class.java,
                     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to valueDeserializer::class.java
@@ -79,11 +63,11 @@ class KafkaFactory(private val config: KafkaConfig) {
             CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SSL",
             SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "JKS",
             SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG to config.truststorePath,
-            SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to config.credstorePsw,
+            SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to config.credstorePassword,
             SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
             SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to config.keystorePath,
-            SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to config.credstorePsw,
-            SslConfigs.SSL_KEY_PASSWORD_CONFIG to config.credstorePsw,
+            SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG to config.credstorePassword,
+            SslConfigs.SSL_KEY_PASSWORD_CONFIG to config.credstorePassword,
             SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to ""
         )
 

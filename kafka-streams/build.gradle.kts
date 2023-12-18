@@ -7,6 +7,7 @@ plugins {
 val koTestVersion = "5.7.2"
 
 dependencies {
+    api(project(":kafka"))
     implementation("org.apache.kafka:kafka-clients:3.6.0")
     implementation("org.apache.kafka:kafka-streams:3.6.0")
     implementation("io.confluent:kafka-streams-avro-serde:7.4.0")

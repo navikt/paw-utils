@@ -8,7 +8,7 @@ val koTestVersion = "5.7.2"
 
 dependencies {
     implementation("org.apache.kafka:kafka-clients:3.6.0")
-    implementation("io.confluent:kafka-avro-serializer:7.4.0")
+    compileOnly("io.confluent:kafka-avro-serializer:7.4.0")
 
     // Test
     testImplementation("io.kotest:kotest-runner-junit5:$koTestVersion")
