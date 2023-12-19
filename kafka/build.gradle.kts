@@ -7,6 +7,7 @@ plugins {
 val koTestVersion = "5.7.2"
 
 dependencies {
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.apache.kafka:kafka-clients:3.6.0")
     compileOnly("io.confluent:kafka-avro-serializer:7.4.0")
 
