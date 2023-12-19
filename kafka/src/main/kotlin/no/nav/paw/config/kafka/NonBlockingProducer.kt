@@ -2,13 +2,13 @@ package no.nav.paw.config.kafka
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.slf4j.LoggerFactory
 
-class NonBlockingKafkaProducer<K, V>(
-    private val kafkaProducerClient: KafkaProducer<K, V>
+class NonBlockingProducer<K, V>(
+    private val kafkaProducerClient: Producer<K, V>
 ) {
     fun send(record: ProducerRecord<K, V>): Deferred<RecordMetadata> {
         val deferred = CompletableDeferred<RecordMetadata>()
@@ -23,7 +23,7 @@ class NonBlockingKafkaProducer<K, V>(
     }
 }
 
-private val logger = LoggerFactory.getLogger(NonBlockingKafkaProducer::class.java)
+private val logger = LoggerFactory.getLogger(NonBlockingProducer::class.java)
 
 suspend fun Deferred<RecordMetadata>.awaitAndLog(messageDescription: String) {
     val recordMetadata = await()
