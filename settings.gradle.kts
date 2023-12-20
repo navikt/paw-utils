@@ -7,7 +7,8 @@ plugins {
 rootProject.name = "paw-utils"
 include(
     "kafka",
-    "kafka-streams"
+    "kafka-streams",
+    "hoplite-config"
 )
 
 dependencyResolutionManagement {
