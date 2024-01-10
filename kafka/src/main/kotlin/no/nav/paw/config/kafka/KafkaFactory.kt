@@ -25,8 +25,8 @@ class KafkaFactory(private val config: KafkaConfig) {
 
     fun <K : Any, V : Any> createProducer(
         clientId: String,
-        keySerializer: Serializer<K>,
-        valueSerializer: Serializer<V>,
+        keySerializer: KClass<out Serializer<K>>,
+        valueSerializer: KClass<out Serializer<V>>,
         acks: String = "all"
     ): Producer<K, V> =
         KafkaProducer(
@@ -34,11 +34,9 @@ class KafkaFactory(private val config: KafkaConfig) {
                 mapOf(
                     ProducerConfig.ACKS_CONFIG to acks,
                     ProducerConfig.CLIENT_ID_CONFIG to clientId,
-                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to keySerializer::class.java,
-                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to valueSerializer::class.java
-                ),
-            keySerializer,
-            valueSerializer
+                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to keySerializer.java,
+                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to valueSerializer.java
+                )
         )
 
     fun <K : Any, V : Any> createConsumer(

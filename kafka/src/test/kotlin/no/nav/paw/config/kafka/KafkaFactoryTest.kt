@@ -71,8 +71,8 @@ class KafkaFactoryTest : StringSpec({
         val producer =
             factory.createProducer(
                 "testId",
-                Serdes.String().serializer(),
-                Serdes.String().serializer()
+                Serdes.String().serializer()::class,
+                Serdes.String().serializer()::class
             )
 
         producer.javaClass shouldBe KafkaProducer::class.java
