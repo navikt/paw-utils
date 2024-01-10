@@ -45,11 +45,13 @@ class KafkaFactory(private val config: KafkaConfig) {
         clientId: String,
         keyDeserializer: Deserializer<K>,
         valueDeserializer: Deserializer<V>,
+        autoCommit: Boolean = false,
         autoOffsetReset: String = "earliest"
     ): KafkaConsumer<K, V> =
         KafkaConsumer(
             baseProperties +
                 mapOf(
+                    ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to autoCommit,
                     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to autoOffsetReset,
                     ConsumerConfig.GROUP_ID_CONFIG to groupId,
                     ConsumerConfig.CLIENT_ID_CONFIG to clientId,
