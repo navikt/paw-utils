@@ -89,10 +89,9 @@ class KafkaFactoryTest : StringSpec({
             factory.createConsumer(
                 groupId = "groupId",
                 clientId = "clientId",
-                keyDeserializer = Serdes.String().deserializer(),
-                valueDeserializer = Serdes.String().deserializer()
+                keyDeserializer = Serdes.String().deserializer()::class,
+                valueDeserializer = Serdes.String().deserializer()::class
             )
-
         consumer.javaClass shouldBe KafkaConsumer::class.java
     }
 })

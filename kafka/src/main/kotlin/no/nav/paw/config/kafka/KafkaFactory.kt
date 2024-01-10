@@ -13,6 +13,7 @@ import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serializer
 import java.util.*
+import kotlin.reflect.KClass
 
 class KafkaFactory(private val config: KafkaConfig) {
     val baseProperties =
@@ -43,8 +44,8 @@ class KafkaFactory(private val config: KafkaConfig) {
     fun <K : Any, V : Any> createConsumer(
         groupId: String,
         clientId: String,
-        keyDeserializer: Deserializer<K>,
-        valueDeserializer: Deserializer<V>,
+        keyDeserializer: KClass<out Deserializer<K>>,
+        valueDeserializer: KClass<out Deserializer<V>>,
         autoCommit: Boolean = false,
         autoOffsetReset: String = "earliest"
     ): KafkaConsumer<K, V> =
@@ -55,8 +56,8 @@ class KafkaFactory(private val config: KafkaConfig) {
                     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to autoOffsetReset,
                     ConsumerConfig.GROUP_ID_CONFIG to groupId,
                     ConsumerConfig.CLIENT_ID_CONFIG to clientId,
-                    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to keyDeserializer::class.java,
-                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to valueDeserializer::class.java
+                    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to keyDeserializer.java,
+                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to valueDeserializer.java
                 )
         )
 
