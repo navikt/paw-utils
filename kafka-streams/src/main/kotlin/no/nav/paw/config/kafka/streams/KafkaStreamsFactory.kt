@@ -10,10 +10,18 @@ import no.nav.paw.config.kafka.KafkaSchemaRegistryConfig
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.streams.StreamsConfig
 import java.util.*
+import kotlin.reflect.KClass
 
-class KafkaStreamsFactory(applicationIdSuffix: String, config: KafkaConfig) {
+class KafkaStreamsFactory private constructor(
+    private val applicationIdSuffix: String,
+    private val config: KafkaConfig,
+    private val additionalProperties: Map<String, Any>
+) {
+    constructor(applicationIdSuffix: String, config: KafkaConfig) : this(applicationIdSuffix, config, emptyMap())
+
     private val schemaRegistry = config.schemaRegistry?.let { schemaRegistryConfig(it) }.orEmpty()
     private val authentication = config.authentication?.let { authenticationConfig(it) }.orEmpty()
     private val baseProperties =
@@ -22,12 +30,28 @@ class KafkaStreamsFactory(applicationIdSuffix: String, config: KafkaConfig) {
             StreamsConfig.APPLICATION_ID_CONFIG to ("${config.applicationIdPrefix}_$applicationIdSuffix")
         ) +
             schemaRegistry +
-            authentication
+            authentication +
+            additionalProperties
 
-    val properties =
-        Properties().apply {
-            putAll(baseProperties)
-        }
+    val properties: Properties
+        get() =
+            Properties().apply {
+                putAll(baseProperties)
+            }
+
+    fun withDefaultKeySerde(serde: KClass<out Serde<*>>): KafkaStreamsFactory =
+        KafkaStreamsFactory(
+            applicationIdSuffix = applicationIdSuffix,
+            config = config,
+            additionalProperties = additionalProperties + (StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG to serde.java.name)
+        )
+
+    fun withDefaultValueSerde(serde: KClass<out Serde<*>>): KafkaStreamsFactory =
+        KafkaStreamsFactory(
+            applicationIdSuffix = applicationIdSuffix,
+            config = config,
+            additionalProperties = additionalProperties + (StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG to serde.java.name)
+        )
 
     fun <T : SpecificRecord> createSpecificAvroSerde(): SpecificAvroSerde<T> =
         SpecificAvroSerde<T>().apply {
