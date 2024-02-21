@@ -1,4 +1,5 @@
 brokers = "${KAFKA_BROKERS}"
+applicationIdPrefix = "${KAFKA_STREAMS_APPLICATION_ID}"
 [authentication]
 keystorePath = "${KAFKA_KEYSTORE_PATH}"
 credstorePassword = "${KAFKA_CREDSTORE_PASSWORD}"
