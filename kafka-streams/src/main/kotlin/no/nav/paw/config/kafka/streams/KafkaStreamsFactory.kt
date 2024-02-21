@@ -22,6 +22,10 @@ class KafkaStreamsFactory private constructor(
 ) {
     constructor(applicationIdSuffix: String, config: KafkaConfig) : this(applicationIdSuffix, config, emptyMap())
 
+    init {
+        require(!config.applicationIdPrefix.isNullOrBlank()) { "Application ID prefix må være satt, settes automatisk når man laster config 'KAFKA_STREAMS_CONFIG_WITH_SCHEME_REG'" }
+    }
+
     private val schemaRegistry = config.schemaRegistry?.let { schemaRegistryConfig(it) }.orEmpty()
     private val authentication = config.authentication?.let { authenticationConfig(it) }.orEmpty()
     private val baseProperties =
