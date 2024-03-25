@@ -61,8 +61,7 @@ class KafkaStreamsFactory private constructor(
         KafkaStreamsFactory(
             applicationIdSuffix = applicationIdSuffix,
             config = config,
-            additionalProperties = additionalProperties +
-                (StreamsConfig.PROCESSING_GUARANTEE_CONFIG to StreamsConfig.EXACTLY_ONCE_V2)
+            additionalProperties = additionalProperties + (StreamsConfig.PROCESSING_GUARANTEE_CONFIG to StreamsConfig.EXACTLY_ONCE_V2)
         )
 
     fun <T : SpecificRecord> createSpecificAvroSerde(): SpecificAvroSerde<T> =
