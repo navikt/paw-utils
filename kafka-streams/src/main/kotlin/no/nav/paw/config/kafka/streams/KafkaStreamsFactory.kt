@@ -57,6 +57,14 @@ class KafkaStreamsFactory private constructor(
             additionalProperties = additionalProperties + (StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG to serde.java.name)
         )
 
+    fun withExactlyOnce(): KafkaStreamsFactory =
+        KafkaStreamsFactory(
+            applicationIdSuffix = applicationIdSuffix,
+            config = config,
+            additionalProperties = additionalProperties +
+                (StreamsConfig.PROCESSING_GUARANTEE_CONFIG to StreamsConfig.EXACTLY_ONCE_V2)
+        )
+
     fun <T : SpecificRecord> createSpecificAvroSerde(): SpecificAvroSerde<T> =
         SpecificAvroSerde<T>().apply {
             configure(schemaRegistry, false)
